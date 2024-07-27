@@ -17,13 +17,13 @@ const userSchema = new mongoose.Schema(
             maxLength: [15, 'Invalid Phone Number Length !!'],
             minLength: [10, 'Invalid Phone Number Length !!'],
             trim: true,
-            unique: true,
+            unique: [true, 'Please use unique Phone Number !'],
             index: true,
         },
         Email: {
             type: String,
             required: [true, 'Please enter your Email !!'],
-            unique: true,
+            unique: [true, 'Please use unique email !!'],
             trim: true,
             index: true,
             validate: [validator.isEmail, 'Enter Valid email !'],
@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema(
             minLength: [4, 'Password should be greater than 4 characters'],
             select: false,
         },
+        DateOfBirth: {
+            type: Date,
+            required: [true, 'Please provide the Date of Birth'],
+        },
         Province: {
             type: String,
             required: [true, 'Please select your province !'],
@@ -41,6 +45,10 @@ const userSchema = new mongoose.Schema(
         District: {
             type: String,
             required: [true, 'Please select your district !'],
+        },
+        Address: {
+            type: String,
+            required: [true, 'Please  provide address !'],
         },
         InsuranceCompanyCategory: {
             type: String,
@@ -61,12 +69,18 @@ const userSchema = new mongoose.Schema(
             type: Number,
             default: 913949,
         },
-        resetPasswordExpire: Date,
-        // To Team Consistency
-        MyLeader: {
-            type: String,
+        resetPasswordExpire: {
+            type: Date,
+            default: null,
         },
-        MyClient: [],
+
+        // To Network Consistency
+        MyLeader: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null,
+        },
+        MyRequests: [],
     },
     {
         toJSON: {

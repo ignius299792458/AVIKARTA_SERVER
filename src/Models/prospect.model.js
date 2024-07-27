@@ -1,15 +1,22 @@
+import mongoose from 'mongoose';
+import validator from 'validator';
+
 const prospectSchema = new mongoose.Schema(
     {
-        CreatedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        Prospectedby: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
         FullName: {
             type: String,
-            required: [true, 'Please enter your full name !'],
+            required: [true, 'Please enter full name !'],
             trim: true,
             index: true,
         },
         Phone: {
             type: String,
-            required: [true, 'Please enter your phone number. !!'],
+            required: [true, 'Please enter phone number. !!'],
             maxLength: [15, 'Invalid Phone Number Length !!'],
             minLength: [10, 'Invalid Phone Number Length !!'],
             trim: true,
@@ -34,11 +41,21 @@ const prospectSchema = new mongoose.Schema(
         },
         Address: {
             type: String,
-            required: [true, 'Please  provide address !'],
+            required: [true, 'Please provide address !'],
         },
         Avatar: {
             type: String,
         },
+        Meeting: [
+            {
+                MeetingDate: Date,
+                MeetingTitle: String,
+                Purpose: String,
+                WhatTheySaid: String,
+                FollowUp: Date,
+                Remark: String,
+            },
+        ],
     },
     {
         toJSON: {
@@ -50,4 +67,4 @@ const prospectSchema = new mongoose.Schema(
     }
 );
 
-export const User = mongoose.model('Prospect', prospectSchema);
+export const Prospect = mongoose.model('Prospect', prospectSchema);

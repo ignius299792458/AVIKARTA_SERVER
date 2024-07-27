@@ -8,12 +8,8 @@ import {
     getUserDetails,
     updatePassword,
     updateProfile,
-    getAllUsers,
-    getSingleUser,
-    updateUserRole,
     deleteUser,
 } from '../Controllers/user.controller.js';
-import { User } from '../models/user.model.js';
 import authenticateUser from '../Middlewares/auth.middleware.js';
 
 const userRouter = Router();
@@ -32,10 +28,8 @@ userRouter.route('/me/update').patch(authenticateUser, updateProfile);
 userRouter.route('/me/delete').delete(authenticateUser, deleteUser);
 
 // __________________________ Zone to testify __________________________
-// for all Users
 userRouter.route('/').get(authenticateUser, async (req, res) => {
-    const alluser = await User.find();
-    res.status(200).send(alluser);
+    res.status(200).json({ user: req.user, message: 'user is working' });
 });
 
 export default userRouter;

@@ -2,13 +2,14 @@ import mongoose from 'mongoose';
 
 const teamSchema = new mongoose.Schema(
     {
-        TeamName: {
+        Name: {
             // Name of Team will be Automatically Team Creator
             type: String,
             required: [true, 'TeamName is necessary'],
             trim: true,
             index: true,
         },
+        Members: [],
     },
     {
         toJSON: {
@@ -20,4 +21,4 @@ const teamSchema = new mongoose.Schema(
     }
 );
 
-export const User = mongoose.model('Team', teamSchema);
+export const Team = mongoose.model('Team', teamSchema);

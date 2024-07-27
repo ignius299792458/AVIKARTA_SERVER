@@ -1,26 +1,29 @@
 import asyncHandler from '../Utils/asyncHandler.util.js';
 import { User } from '../models/user.model.js';
 import ApiError from '../Utils/apiError.util.js';
-import ApiResponse from '../Utils/apiResponse.util.js';
 import sendTokenResponse from '../Utils/sendTokenRes.util.js';
 import sendEmail from '../Utils/sendEmail.util.js';
-import crypto from 'crypto';
 
 //registration
 const registerUser = asyncHandler(async (req, res) => {
     try {
         // console.log(req.body);
         const { Email, Phone } = req.body;
+        // phone checking
+        const checkingUserPhoneExistAlready = await User.findOne({
+            Phone: Phone,
+        });
+        if (checkingUserPhoneExistAlready) {
+            throw new ApiError(409, 'Already used phone number.');
+        }
 
-        const checkingUseExistAlready = await User.findOne({
-            $or: [{ Email }, { Phone }],
+        // email checking
+        const checkingUserEmailExistAlready = await User.findOne({
+            Email: Email,
         });
 
-        if (checkingUseExistAlready) {
-            throw new ApiError(
-                409,
-                'Already used Phone Number or Email: ' + `${Email} ${Phone}`
-            );
+        if (checkingUserEmailExistAlready) {
+            throw new ApiError(409, 'Already used email.');
         }
 
         const newUser = await User.create({ ...req.body });
@@ -35,7 +38,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
         sendTokenResponse(201, newUser, res, 'Registration Successful !! 😎');
     } catch (err) {
-        res.status(400).json({
+        res.status(500).json({
             statusCode: err.statusCode,
             Error: err.message,
         });
@@ -65,7 +68,7 @@ const loginUser = asyncHandler(async (req, res) => {
             throw new ApiError(401, 'Paswrod Invalid !! 😣');
         }
     } catch (err) {
-        res.status(404).json({
+        res.status(500).json({
             statusCode: err.statusCode,
             Error: err.message,
         });
@@ -101,7 +104,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
             message: `Email is sent to ${validUser.Email} successfully`,
         });
     } catch (err) {
-        res.status(404).json({
+        res.status(500).json({
             statusCode: err.statusCode,
             message: err.message,
         });
@@ -112,7 +115,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 const resetPassword = asyncHandler(async (req, res) => {
     try {
         console.log('reset password: ', req.body);
-        const { Phone, OTP, resetPassword } = req.body;
+        const { Phone, OTP } = req.body;
 
         const resetUser = await User.findOne({
             Phone: Phone,
@@ -135,8 +138,7 @@ const resetPassword = asyncHandler(async (req, res) => {
             throw new ApiError(400, 'Wrong OTP !!');
         }
     } catch (err) {
-        res.status(400).json({
-            routes: 'reset password !!',
+        res.status(500).json({
             statusCode: 400,
             message: err.message,
         });
@@ -146,20 +148,21 @@ const resetPassword = asyncHandler(async (req, res) => {
 // -------> required authenticated tokenization routes <---------
 
 // logout
-const logOut = asyncHandler(async (req, res, next) => {
+const logOut = asyncHandler(async (req, res) => {
     // Clear token from client-side storage (e.g., cookies or local storage)
     // res.clearCookie('jwtToken'); // Example for clearing cookie
 
     if (req.user) {
         res.status(200).json({
             success: true,
-            message: req.user.FullName + 'User is logged out successfully !!',
+            logStatus: 'checkout',
+            message: req.user.FullName + ' is logged out successfully !!',
         });
     }
 });
 
 // updatePassword
-const updatePassword = asyncHandler(async (req, res, next) => {
+const updatePassword = asyncHandler(async (req, res) => {
     try {
         // console.log("update pswd:: ", req.user, req.body);
         const user = await User.findOne(req.user._id).select('+Password');
@@ -182,8 +185,7 @@ const updatePassword = asyncHandler(async (req, res, next) => {
             message: 'Password Updated Successfully !! 😎',
         });
     } catch (err) {
-        res.status(400).json({
-            route: 'update password',
+        res.status(500).json({
             statusCode: err.statusCode,
             message: err.message,
         });
@@ -191,21 +193,28 @@ const updatePassword = asyncHandler(async (req, res, next) => {
 });
 
 //  getUserDetails
-const getUserDetails = asyncHandler(async (req, res, next) => {
+const getUserDetails = asyncHandler(async (req, res) => {
     try {
-        const user = await User.findOne(req.user._id);
-        if (!user) {
-            throw new ApiError(404, "Users' detail is not found !!");
-        }
+        // const user = await User.findOne(req.user._id);
+        // if (!user) {
+        //     throw new ApiError(404, "Users' detail is not found !!");
+        // }
 
-        res.status(200).json({
-            statusCode: 200,
-            user: user,
-            message: 'User Details !! 😎',
-        });
+        // res.status(200).json({
+        //     statusCode: 200,
+        //     user: user,
+        //     message: 'User Details !! 😎',
+        // });
+
+        if (req.user) {
+            res.status(200).json({
+                statusCode: 200,
+                user: req.user,
+                message: 'User Details !! 😎',
+            });
+        }
     } catch (err) {
-        res.status(404).json({
-            route: 'get user details',
+        res.status(500).json({
             statusCode: err.statusCode,
             message: err.message,
         });
@@ -213,30 +222,12 @@ const getUserDetails = asyncHandler(async (req, res, next) => {
 });
 
 // update Profile
-const updateProfile = asyncHandler(async (req, res, next) => {
-    res.status(200).json(new ApiResponse(200, {}, 'Update Profile !'));
+const updateProfile = asyncHandler(async (req, res) => {
+    res.status(200).json({ message: 'update profile' });
 });
 
-// getAllUsers
-const getAllUsers = asyncHandler(async (req, res, next) => {
-    res.status(200).json(new ApiResponse(200, {}, 'Get All Users!'));
-});
-
-// getSingleUser : for admin
-const getSingleUser = asyncHandler(async (req, res, next) => {
-    res.status(200).json(
-        new ApiResponse(200, {}, 'Get Single User: admin Details !')
-    );
-});
-
-// updateUserRole: for admin
-const updateUserRole = asyncHandler(async (req, res, next) => {
-    res.status(200).json(new ApiResponse(200, {}, 'Update User Role: admin!'));
-});
-
-// deleteUser : for admin
-const deleteUser = asyncHandler(async (req, res, next) => {
-    res.status(200).json(new ApiResponse(200, {}, 'Delete User !'));
+const deleteUser = asyncHandler(async (req, res) => {
+    res.status(200).json({ message: 'Delete user portal' });
 });
 
 export {
@@ -248,8 +239,5 @@ export {
     getUserDetails,
     updatePassword,
     updateProfile,
-    getAllUsers,
-    getSingleUser,
-    updateUserRole,
     deleteUser,
 };

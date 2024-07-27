@@ -19,13 +19,12 @@ const authenticateUser = asyncHandler(async (req, res, next) => {
             Token,
             process.env.ACCESS_TOKEN_SECRET
         );
-        // console.log('jwt verified: ', verifyUser);
         if (!verifyUser) {
             throw new ApiError(401, 'User is not authenticated !!');
         }
 
         req.user = await User.findById(verifyUser._id);
-        // console.log('auth user: ', req.user);
+
         next();
     } catch (err) {
         next({
