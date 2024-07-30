@@ -24,15 +24,19 @@ app.use(cookieParser()); // cookie-parser
 //     return new ObjectId(this.toString());
 // };
 
-// Routers imports
+// Routers
 import userRouter from './Routes/user.route.js';
 import prospectRouter from './Routes/prospect.route.js';
 import clientRouter from './Routes/client.route.js';
+import teamRouter from './Routes/team.route.js';
+import reportRouter from './Routes/report.route.js';
 
-//  Route declaration
+//  Route middleware
 app.use('/v1/user', userRouter);
 app.use('/v1/prospect', prospectRouter);
 app.use('/v1/client', clientRouter);
+app.use('/v1/team', teamRouter);
+app.use('/v1/report', reportRouter);
 
 // API testing
 app.get('/', function (req, res, next) {
