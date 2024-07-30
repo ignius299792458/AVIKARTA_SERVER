@@ -1,5 +1,5 @@
 import asyncHandler from '../Utils/asyncHandler.util.js';
-import { User } from '../models/user.model.js';
+import User from '../Models/user.model.js';
 import ApiError from '../Utils/apiError.util.js';
 import sendTokenResponse from '../Utils/sendTokenRes.util.js';
 import sendEmail from '../Utils/sendEmail.util.js';
@@ -36,7 +36,7 @@ const registerUser = asyncHandler(async (req, res) => {
             throw new ApiError(500, 'Registration Fail !!');
         }
 
-        sendTokenResponse(201, newUser, res, 'Registration Successful !! 😎');
+        sendTokenResponse(201, newUser, res, 'Registration Successfull !! 😎');
     } catch (err) {
         res.status(500).json({
             statusCode: err.statusCode,
@@ -65,7 +65,7 @@ const loginUser = asyncHandler(async (req, res) => {
         if (isPasswordMatched) {
             sendTokenResponse(200, loggedUser, res, 'Login Successfull !! 😎');
         } else {
-            throw new ApiError(401, 'Paswrod Invalid !! 😣');
+            throw new ApiError(401, 'Password Invalid !! 😣');
         }
     } catch (err) {
         res.status(500).json({

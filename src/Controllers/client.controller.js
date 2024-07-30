@@ -1,5 +1,4 @@
 import asyncHandler from '../Utils/asyncHandler.util.js';
-import { User } from '../models/user.model.js';
 import ApiError from '../Utils/apiError.util.js';
 import { Client } from '../Models/client.model.js';
 import { ObjectId } from 'mongodb';
@@ -10,6 +9,7 @@ export const registerClient = asyncHandler(async (req, res) => {
         if (!req.user) {
             throw new ApiError(401, 'User Session expired!! Try Re Login !');
         }
+        // console.log(req.body);
 
         const newClient = await Client.create({
             OwnedBy: req.user._id,
@@ -18,8 +18,9 @@ export const registerClient = asyncHandler(async (req, res) => {
 
         if (newClient) {
             res.status(200).json({
-                data: newClient,
-                message: 'Client registered successfully. !!',
+                message:
+                    newClient.FullName +
+                    ' is registered successfully as your client!!',
             });
         } else {
             throw new ApiError(500, 'Client registration failed !!');
