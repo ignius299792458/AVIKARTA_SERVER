@@ -2,14 +2,30 @@ import mongoose from 'mongoose';
 
 const teamSchema = new mongoose.Schema(
     {
-        Name: {
-            // Name of Team will be Automatically Team Creator
+        TeamName: {
             type: String,
-            required: [true, 'TeamName is necessary'],
+            required: [true, 'Team Name is necessary !'],
             trim: true,
             index: true,
+            unique: [true, 'Team Name is already taken !'],
         },
-        Members: [],
+        TeamMembers: [
+            {
+                FullName: String,
+                Phone: String,
+                Address: String,
+                Email: String,
+                MembershipStatus: {
+                    type: String,
+                    default: 'pending',
+                },
+            },
+        ],
+        TeamLeader: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: [true, "TeamLeader can't be empty !"],
+        },
     },
     {
         toJSON: {

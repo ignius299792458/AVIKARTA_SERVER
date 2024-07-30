@@ -21,11 +21,10 @@ const clientSchema = new mongoose.Schema(
             maxLength: [15, 'Invalid Phone Number Length !!'],
             minLength: [10, 'Invalid Phone Number Length !!'],
             trim: true,
-            unique: true,
             index: true,
         },
         DateOfBirth: {
-            type: Date,
+            type: String,
             required: [true, 'Please provide the Date of Birth'],
         },
         Email: {
@@ -41,12 +40,13 @@ const clientSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Please select district !'],
         },
-        Address: {
+        Municipality: {
             type: String,
-            required: [true, 'Please provide address !'],
+            required: [true, 'Please select municipality !'],
         },
         Avatar: {
-            type: String,
+            PublicId: String,
+            SecureURL: String,
         },
 
         ClientInsuranceInfo: {
@@ -108,7 +108,8 @@ const clientSchema = new mongoose.Schema(
                 default: [true, 'Please enter a policy issue branch name'],
             },
             PhotoOfPolicy: {
-                type: String,
+                PublicId: String,
+                SecureURL: String,
             },
             PolicyFileReceivedBy: {
                 type: String,

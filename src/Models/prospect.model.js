@@ -22,6 +22,10 @@ const prospectSchema = new mongoose.Schema(
             trim: true,
             index: true,
         },
+        DateOfBirth: {
+            type: String,
+            required: [true, 'Please provide the Date of Birth'],
+        },
         Email: {
             type: String,
             trim: true,

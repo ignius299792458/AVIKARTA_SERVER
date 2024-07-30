@@ -46,9 +46,9 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Please select your district !'],
         },
-        Address: {
+        Municipality: {
             type: String,
-            required: [true, 'Please  provide address !'],
+            required: [true, 'Please select municipality !'],
         },
         InsuranceCompanyCategory: {
             type: String,
@@ -62,7 +62,8 @@ const userSchema = new mongoose.Schema(
             type: String,
         },
         Avatar: {
-            type: String,
+            PublicId: String,
+            SecureURL: String,
         },
 
         OTP: {
@@ -81,6 +82,10 @@ const userSchema = new mongoose.Schema(
             default: null,
         },
         MyRequests: [],
+        MyTeam: {
+            type: String,
+            default: null,
+        },
     },
     {
         toJSON: {
@@ -136,4 +141,5 @@ userSchema.methods.getResetPswdToken = async function () {
     return OTP;
 };
 
-export const User = mongoose.model('User', userSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+export default User;
