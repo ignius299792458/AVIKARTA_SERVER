@@ -68,7 +68,7 @@ const userSchema = new mongoose.Schema(
 
         OTP: {
             type: Number,
-            default: 913949,
+            default: 903950,
         },
         resetPasswordExpire: {
             type: Date,
@@ -91,6 +91,7 @@ const userSchema = new mongoose.Schema(
         toJSON: {
             transform(doc, ret) {
                 delete ret.Password;
+                delete ret.OTP, delete ret.resetPasswordExpire;
                 delete ret.__v;
             },
         },
@@ -107,6 +108,19 @@ userSchema.pre('save', async function (next) {
     this.Password = await bcrypt.hash(this.Password, 10); // encryption
     next();
 });
+
+userSchema.methods.changePassword = async function (newPassword) {
+    console.log(newPassword);
+    this.Password = await bcrypt.hash(newPassword, 10, (res) => {
+        if (res) {
+            console.log('change hash: ', this.Password);
+            console.log('user: ', this);
+            return next();
+        } else {
+            return false;
+        }
+    });
+};
 
 //  Access Token
 userSchema.methods.generateAccessToken = function () {
@@ -135,9 +149,12 @@ function generateOTP() {
 // Generating psswd reset token
 userSchema.methods.getResetPswdToken = async function () {
     // hashing and adding resetpsswd token
+    // console.log('\nbefore: ', this.OTP);
     const OTP = generateOTP();
-    this.resetPasswordToken = OTP;
+    this.OTP = Number(OTP);
     this.resetPasswordExpire = Date.now() + 2 * 60 * 1000; // expires in 2 mins
+    await this.save();
+    // console.log('after: ', this.OTP);
     return OTP;
 };
 

@@ -43,12 +43,13 @@ const prospectSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Please select district !'],
         },
-        Address: {
+        Municipality: {
             type: String,
-            required: [true, 'Please provide address !'],
+            required: [true, 'Please select municipality!'],
         },
         Avatar: {
-            type: String,
+            PublicId: String,
+            SecureURL: String,
         },
         Meeting: [
             {

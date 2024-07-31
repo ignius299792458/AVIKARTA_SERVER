@@ -79,19 +79,21 @@ const loginUser = asyncHandler(async (req, res) => {
 const forgotPassword = asyncHandler(async (req, res) => {
     try {
         const { Email, Phone } = req.body;
+
         const validUser = await User.findOne({
             $or: [{ Email }, { Phone }],
         });
+
         if (!validUser) {
             throw new ApiError(404, 'Email or Phone Number is found !!');
         }
 
         // Reset password Token
-        const resetToken = await validUser.getResetPswdToken();
+        const OTP = await validUser.getResetPswdToken();
 
-        await validUser.save({ validateBeforeSave: false });
+        // await validUser.save({ validateBeforeSave: false });
 
-        const message = `Your OTP is : ${resetToken} \n\n Please delete email after OTP is used and don't share to anybody this OTP. \n\n This OTP will expire after 2 mins.`;
+        const message = `Your OTP is : ${OTP} \n\n Please delete email after OTP is used and don't share to anybody this OTP. \n\n This OTP will expire after 2 mins.`;
 
         await sendEmail({
             email: validUser.Email,
@@ -115,25 +117,29 @@ const forgotPassword = asyncHandler(async (req, res) => {
 const resetPassword = asyncHandler(async (req, res) => {
     try {
         console.log('reset password: ', req.body);
-        const { Phone, OTP } = req.body;
+        const { Phone, OTP, newPassword } = req.body;
 
         const resetUser = await User.findOne({
             Phone: Phone,
         });
 
-        if (Date.now() <= resetUser.resetPasswordExpire)
-            throw new ApiError(400, 'Reset OTP is Expired !');
+        // if (String(Date.now()) >= String(resetUser.resetPasswordExpire)) {
+        //     throw new ApiError(400, 'OTP is Expired !');
+        // }
 
         // save confirmed password
+        console.log('OTPs: ', resetUser.OTP, OTP);
         if (resetUser.OTP === OTP) {
-            // await rese;
+            await resetUser.changePassword(newPassword);
             resetUser.resetPasswordExpire = undefined;
             await resetUser.save();
-
             res.status(200).json({
                 status: 200,
                 message: 'Reset Password Successfull !! 😎',
             });
+            if (!isChanged) {
+                throw new ApiError(500, 'Reseting Password Failed !! ');
+            }
         } else {
             throw new ApiError(400, 'Wrong OTP !!');
         }
