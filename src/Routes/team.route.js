@@ -14,7 +14,7 @@ teamRouter.route('/register-team').post(authenticateUser, createTeam);
 
 teamRouter.route('/add-member').post(authenticateUser, addTeamMember);
 
-teamRouter.route('/team-detail/:team_id').get(authenticateUser, getTeamDetail);
+teamRouter.route('/team-detail').get(authenticateUser, getTeamDetail);
 
 teamRouter
     .route('/team-request-accept')

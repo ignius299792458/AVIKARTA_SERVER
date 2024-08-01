@@ -53,18 +53,19 @@ const loginUser = asyncHandler(async (req, res) => {
         if (!Phone || !Password) {
             throw new ApiError(400, 'Phone or Password is missing!!');
         }
-        const loggedUser = await User.findOne({ Phone: Phone }).select(
-            '+Password'
-        );
+        const loggedUser = await User.findOne({ Phone: Phone });
 
         if (!loggedUser) {
             throw new ApiError(404, 'User is not registered !! -> ');
         }
-        const isPasswordMatched = await loggedUser.checkPassword(Password);
 
+        const isPasswordMatched = await loggedUser.checkPassword(Password);
+        console.log('pas val: ', isPasswordMatched);
         if (isPasswordMatched) {
+            console.log(loggedUser.Password);
             sendTokenResponse(200, loggedUser, res, 'Login Successfull !! 😎');
         } else {
+            console.log(loggedUser.Password, '\n\nuser: ', loggedUser);
             throw new ApiError(401, 'Password Invalid !! 😣');
         }
     } catch (err) {
@@ -130,14 +131,14 @@ const resetPassword = asyncHandler(async (req, res) => {
         // save confirmed password
         console.log('OTPs: ', resetUser.OTP, OTP);
         if (resetUser.OTP === OTP) {
-            await resetUser.changePassword(newPassword);
-            resetUser.resetPasswordExpire = undefined;
-            await resetUser.save();
-            res.status(200).json({
-                status: 200,
-                message: 'Reset Password Successfull !! 😎',
-            });
-            if (!isChanged) {
+            const isChanged = await resetUser.changePassword(newPassword);
+            if (isChanged) {
+                res.status(200).json({
+                    status: 200,
+                    Password: resetUser.Password,
+                    message: 'Reset Password Successfull !! 😎',
+                });
+            } else {
                 throw new ApiError(500, 'Reseting Password Failed !! ');
             }
         } else {

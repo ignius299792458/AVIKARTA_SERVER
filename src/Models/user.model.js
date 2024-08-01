@@ -32,7 +32,6 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Please Enter Your Password'],
             minLength: [4, 'Password should be greater than 4 characters'],
-            select: false,
         },
         DateOfBirth: {
             type: Date,
@@ -72,7 +71,7 @@ const userSchema = new mongoose.Schema(
         },
         resetPasswordExpire: {
             type: Date,
-            default: null,
+            default: undefined,
         },
 
         // To Network Consistency
@@ -110,16 +109,16 @@ userSchema.pre('save', async function (next) {
 });
 
 userSchema.methods.changePassword = async function (newPassword) {
-    console.log(newPassword);
-    this.Password = await bcrypt.hash(newPassword, 10, (res) => {
-        if (res) {
-            console.log('change hash: ', this.Password);
-            console.log('user: ', this);
-            return next();
-        } else {
-            return false;
-        }
-    });
+    console.log('\n\nbefore user: ', this.Password, this.Phone, this.FullName);
+    this.Password = await bcrypt.hash(newPassword, 10);
+    this.resetPasswordExpire = undefined;
+    await this.save();
+    if (this.checkPassword(newPassword)) {
+        console.log('after changed: ', this.Password);
+        return true;
+    } else {
+        return false;
+    }
 };
 
 //  Access Token
@@ -131,7 +130,14 @@ userSchema.methods.generateAccessToken = function () {
 
 // check password
 userSchema.methods.checkPassword = async function (Password) {
+    console.log('checkingPassword: ', Password);
     return (await bcrypt.compare(Password, this.Password)).valueOf(); // checking pswd
+    // return (
+    //     await bcrypt.compare(
+    //         Password,
+    //         '$2b$10$LrAtJM37zKmSyXFg8NHlSOvAdDjB1cTgvYFmEuZXWgxlQbJPtpDU.'
+    //     )
+    // ).valueOf(); // checking pswd
 };
 
 // six Code OTP generator
@@ -149,12 +155,12 @@ function generateOTP() {
 // Generating psswd reset token
 userSchema.methods.getResetPswdToken = async function () {
     // hashing and adding resetpsswd token
-    // console.log('\nbefore: ', this.OTP);
+    console.log('\nbefore: ', this.OTP);
     const OTP = generateOTP();
     this.OTP = Number(OTP);
     this.resetPasswordExpire = Date.now() + 2 * 60 * 1000; // expires in 2 mins
     await this.save();
-    // console.log('after: ', this.OTP);
+    console.log('after: ', this.OTP);
     return OTP;
 };
 

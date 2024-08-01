@@ -158,9 +158,9 @@ export const getTeamDetail = asyncHandler(async (req, res) => {
             throw new ApiError(401, 'User Session expired!! Try Re Login !');
         }
 
-        const { team_id } = req.params;
-
-        const teamDetail = await Team.findById(new ObjectId(String(team_id)));
+        const teamDetail = await Team.findOne({
+            TeamLeader: new ObjectId(String(req.user._id)),
+        });
 
         if (String(req.user._id) === String(teamDetail.TeamLeader)) {
             res.status(200).json({
