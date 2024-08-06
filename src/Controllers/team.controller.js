@@ -130,13 +130,13 @@ export const addTeamMember = asyncHandler(async (req, res) => {
         const toTheRequest = await addingMember.save();
         if (toTheRequest && toTheTeam) {
             // send mail to the requested person
-            const message = `Dear ${addingMember.FullName}, \n\n ${user.FullName} sent you membership to join his team: " ${teamDetail.TeamName} "`;
+            // const message = `Dear ${addingMember.FullName}, \n\n ${user.FullName} sent you membership to join his team: " ${teamDetail.TeamName} "`;
 
-            await sendEmail({
-                email: addingMember.Email,
-                subject: `AVIKARTA: ${user.FullName} sent you membership request. `,
-                mailContent: message,
-            });
+            // await sendEmail({
+            //     email: addingMember.Email,
+            //     subject: `AVIKARTA: ${user.FullName} sent you membership request. `,
+            //     mailContent: message,
+            // });
 
             res.status(200).json({
                 message: `Membership request is sent to the ${addingMember.FullName} successfully !!`,

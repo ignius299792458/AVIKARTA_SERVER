@@ -73,7 +73,10 @@ const userSchema = new mongoose.Schema(
             type: Date,
             default: undefined,
         },
-
+        SelfAssured: {
+            type: Number,
+            default: 0,
+        },
         // To Network Consistency
         MyLeader: {
             type: mongoose.Schema.Types.ObjectId,

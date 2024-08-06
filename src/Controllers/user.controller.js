@@ -3,6 +3,7 @@ import User from '../Models/user.model.js';
 import ApiError from '../Utils/apiError.util.js';
 import sendTokenResponse from '../Utils/sendTokenRes.util.js';
 import sendEmail from '../Utils/sendEmail.util.js';
+import { ObjectId } from 'mongodb';
 
 //registration
 const registerUser = asyncHandler(async (req, res) => {
@@ -59,7 +60,8 @@ const loginUser = asyncHandler(async (req, res) => {
             throw new ApiError(404, 'User is not registered !! -> ');
         }
 
-        const isPasswordMatched = await loggedUser.checkPassword(Password);
+        // const isPasswordMatched = await loggedUser.checkPassword(Password);
+        const isPasswordMatched = (await loggedUser.Password) === Password;
         console.log('pas val: ', isPasswordMatched);
         if (isPasswordMatched) {
             console.log(loggedUser.Password);
@@ -202,24 +204,41 @@ const updatePassword = asyncHandler(async (req, res) => {
 //  getUserDetails
 const getUserDetails = asyncHandler(async (req, res) => {
     try {
-        // const user = await User.findOne(req.user._id);
-        // if (!user) {
-        //     throw new ApiError(404, "Users' detail is not found !!");
-        // }
-
-        // res.status(200).json({
-        //     statusCode: 200,
-        //     user: user,
-        //     message: 'User Details !! 😎',
-        // });
-
-        if (req.user) {
-            res.status(200).json({
-                statusCode: 200,
-                user: req.user,
-                message: 'User Details !! 😎',
-            });
+        console.log('user dtail: ', req.user);
+        const userDetail = await User.findById(
+            new ObjectId(String(req.user._id))
+        );
+        if (!userDetail) {
+            throw new ApiError(404, "Users' detail is not found !!");
         }
+
+        res.status(200).json({
+            statusCode: 200,
+            user: userDetail,
+            message: 'User Details !! 😎',
+        });
+    } catch (err) {
+        res.status(500).json({
+            statusCode: err.statusCode,
+            message: err.message,
+        });
+    }
+});
+
+// insertManyUser
+const insertManyUser = asyncHandler(async (req, res) => {
+    try {
+        const manyUser = await User.insertMany(req.body)
+            .then((response) => {
+                if (response) {
+                    res.status(200).json({
+                        message: 'all user registered successfully ! 😜',
+                    });
+                }
+            })
+            .catch((err) => {
+                throw new ApiError(409, 'Insery many failed with ' + err);
+            });
     } catch (err) {
         res.status(500).json({
             statusCode: err.statusCode,
@@ -247,4 +266,5 @@ export {
     updatePassword,
     updateProfile,
     deleteUser,
+    insertManyUser,
 };

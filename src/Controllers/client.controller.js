@@ -2,6 +2,7 @@ import asyncHandler from '../Utils/asyncHandler.util.js';
 import ApiError from '../Utils/apiError.util.js';
 import { Client } from '../Models/client.model.js';
 import { ObjectId } from 'mongodb';
+import User from '../Models/user.model.js';
 
 // register Clients
 export const registerClient = asyncHandler(async (req, res) => {
@@ -16,7 +17,15 @@ export const registerClient = asyncHandler(async (req, res) => {
             ...req.body,
         });
 
-        if (newClient) {
+        const USER = await User.findById(new ObjectId(String(req.user._id)));
+
+        if (newClient && USER) {
+            // agent summ assured update
+            USER.SelfAssured += newClient.ClientInsuranceInfo.SumAssured;
+
+            await USER.save();
+
+            // res
             res.status(200).json({
                 message:
                     newClient.FullName +
@@ -135,6 +144,45 @@ export const deleteClient = asyncHandler(async (req, res) => {
         } else {
             throw new ApiError(404, 'Client not found !!');
         }
+    } catch (err) {
+        res.status(500).json({
+            statusCode: err.statusCode,
+            message: err.message,
+        });
+    }
+});
+
+// registerManyClient
+
+export const registerManyClient = asyncHandler(async (req, res) => {
+    try {
+        if (!req.user) {
+            throw new ApiError(401, 'User Session expired!! Try Re Login !');
+        }
+        // console.log(req.body);
+        const data = req.body;
+
+        const manyClient = data.map((item, _) => {
+            return {
+                OwnedBy: req.user._id,
+                ...item,
+            };
+        });
+
+        const manyClientReg = await Client.insertMany(manyClient)
+            .then((response) => {
+                if (response) {
+                    res.status(200).json({
+                        message: 'Many Clients registration successful !',
+                    });
+                }
+            })
+            .catch((err) => {
+                throw new ApiError(
+                    500,
+                    'many Clients registration failed !!' + err
+                );
+            });
     } catch (err) {
         res.status(500).json({
             statusCode: err.statusCode,

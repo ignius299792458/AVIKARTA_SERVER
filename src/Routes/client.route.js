@@ -5,11 +5,16 @@ import {
     getClients,
     updateClient,
     deleteClient,
+    registerManyClient,
 } from '../Controllers/client.controller.js';
 
 const clientRouter = Router();
 
 clientRouter.route('/new').post(registerClient);
+
+// insert many
+clientRouter.route('/insert_many').post(registerManyClient);
+
 clientRouter.route('/all/:page_no').get(getClients);
 clientRouter.route('/:client_id').get(getClientDetail);
 clientRouter.route('/:client_id').put(updateClient);
