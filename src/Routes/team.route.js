@@ -1,6 +1,5 @@
 import { Router } from 'express';
 
-import authenticateUser from '../Middlewares/auth.middleware.js';
 import {
     createTeam,
     addTeamMember,
@@ -10,14 +9,12 @@ import {
 
 const teamRouter = Router();
 
-teamRouter.route('/register-team').post(authenticateUser, createTeam);
+teamRouter.route('/register-team').post(createTeam);
 
-teamRouter.route('/add-member').post(authenticateUser, addTeamMember);
+teamRouter.route('/add-member').post(addTeamMember);
 
-teamRouter.route('/team-detail').get(authenticateUser, getTeamDetail);
+teamRouter.route('/team-detail').get(getTeamDetail);
 
-teamRouter
-    .route('/team-request-accept')
-    .patch(authenticateUser, teamRequestAcceptHandler);
+teamRouter.route('/team-request-accept').patch(teamRequestAcceptHandler);
 
 export default teamRouter;

@@ -8,7 +8,7 @@ export const registerProspect = asyncHandler(async (req, res) => {
         if (!req.user) {
             throw new ApiError(401, 'User Session expired!! Try Re Login !');
         }
-        // console.log('prospect: -----\n', req.body);
+        console.log('prospect: -----\n', req.user);
 
         const newProspect = await Prospect.create({
             Prospectedby: req.user._id,

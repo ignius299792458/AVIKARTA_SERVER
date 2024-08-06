@@ -8,15 +8,13 @@ import {
     searchProspects,
 } from '../Controllers/prospect.controller.js';
 
-import authenticateUser from '../Middlewares/auth.middleware.js';
-
 const prospectRouter = Router();
 
-prospectRouter.route('/new').post(authenticateUser, registerProspect);
-prospectRouter.route('/all/:page_no').get(authenticateUser, getMyPropects);
-prospectRouter.route('/:prospect_id').get(authenticateUser, getPropectDetail);
-prospectRouter.route('/:prospect_id').put(authenticateUser, updateProspect);
-prospectRouter.route('/:prospect_id').delete(authenticateUser, deleteProspect);
-prospectRouter.route('/search').get(authenticateUser, searchProspects);
+prospectRouter.route('/new').post(registerProspect);
+prospectRouter.route('/all/:page_no').get(getMyPropects);
+prospectRouter.route('/:prospect_id').get(getPropectDetail);
+prospectRouter.route('/:prospect_id').put(updateProspect);
+prospectRouter.route('/:prospect_id').delete(deleteProspect);
+prospectRouter.route('/search').get(searchProspects);
 
 export default prospectRouter;

@@ -1,6 +1,5 @@
 import { Router } from 'express';
 
-import authenticateUser from '../Middlewares/auth.middleware.js';
 import {
     selfAssuredReport,
     totalTeamBudgetReport,
@@ -8,11 +7,7 @@ import {
 
 const reportRouter = Router();
 
-reportRouter
-    .route('/self-assured-report')
-    .post(authenticateUser, selfAssuredReport);
-reportRouter
-    .route('/total-team-budget')
-    .get(authenticateUser, totalTeamBudgetReport);
+reportRouter.route('/self-assured-report').post(selfAssuredReport);
+reportRouter.route('/total-team-budget').get(totalTeamBudgetReport);
 
 export default reportRouter;

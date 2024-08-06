@@ -7,14 +7,12 @@ import {
     deleteClient,
 } from '../Controllers/client.controller.js';
 
-import authenticateUser from '../Middlewares/auth.middleware.js';
-
 const clientRouter = Router();
 
-clientRouter.route('/new').post(authenticateUser, registerClient);
-clientRouter.route('/all/:page_no').get(authenticateUser, getClients);
-clientRouter.route('/:client_id').get(authenticateUser, getClientDetail);
-clientRouter.route('/:client_id').put(authenticateUser, updateClient);
-clientRouter.route('/:client_id').delete(authenticateUser, deleteClient);
+clientRouter.route('/new').post(registerClient);
+clientRouter.route('/all/:page_no').get(getClients);
+clientRouter.route('/:client_id').get(getClientDetail);
+clientRouter.route('/:client_id').put(updateClient);
+clientRouter.route('/:client_id').delete(deleteClient);
 
 export default clientRouter;

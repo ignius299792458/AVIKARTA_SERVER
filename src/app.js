@@ -30,13 +30,14 @@ import prospectRouter from './Routes/prospect.route.js';
 import clientRouter from './Routes/client.route.js';
 import teamRouter from './Routes/team.route.js';
 import reportRouter from './Routes/report.route.js';
+import authenticateUser from './Middlewares/auth.middleware.js';
 
 //  Route middleware
 app.use('/v1/user', userRouter);
-app.use('/v1/prospect', prospectRouter);
-app.use('/v1/client', clientRouter);
-app.use('/v1/team', teamRouter);
-app.use('/v1/report', reportRouter);
+app.use('/v1/prospect', authenticateUser, prospectRouter);
+app.use('/v1/client', authenticateUser, clientRouter);
+app.use('/v1/team', authenticateUser, teamRouter);
+app.use('/v1/report', authenticateUser, reportRouter);
 
 // API testing
 app.get('/', function (req, res, next) {
