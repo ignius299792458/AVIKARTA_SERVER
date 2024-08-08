@@ -53,11 +53,12 @@ const prospectSchema = new mongoose.Schema(
         },
         Meeting: [
             {
-                MeetingDate: Date,
+                MeetingDate: String,
                 MeetingTitle: String,
                 Purpose: String,
                 WhatTheySaid: String,
-                FollowUp: Date,
+                FollowUp: String,
+                Time: String,
                 Remark: String,
             },
         ],

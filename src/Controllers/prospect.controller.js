@@ -46,7 +46,15 @@ export const getMyPropects = asyncHandler(async (req, res) => {
         if (allMyPropects) {
             res.status(200).json({
                 message: 'check out all the prospects !!',
-                data: allMyPropects,
+                data: allMyPropects.map((prospect, _) => {
+                    return {
+                        FullName: prospect.FullName,
+                        Phone: prospect.Phone,
+                        Address: `${prospect.District} ${prospect.Address}`,
+                        CreatedAt: prospect.createdAt,
+                        _id: prospect.id,
+                    };
+                }),
             });
         } else {
             throw new ApiError(500, 'Prospect fetch failed !! 😰');
@@ -148,6 +156,89 @@ export const searchProspects = asyncHandler(async (req, res) => {
             data: {},
             message: 'sezrzch result!! 😆',
         });
+    } catch (err) {
+        res.status(500).json({
+            statusCode: err.statusCode,
+            message: err.message,
+        });
+    }
+});
+
+// registerMeeting
+export const registerMeeting = asyncHandler(async (req, res) => {
+    try {
+        if (!req.user) {
+            throw new ApiError(401, 'User Session expired!! Try Re Login !');
+        }
+
+        console.log(req.body);
+        const { prospectID, meetingDetail } = req.body;
+
+        // prospect detail
+        const PROSPECT = await Prospect.findById(
+            new ObjectId(String(prospectID))
+        );
+        if (!PROSPECT) {
+            throw new ApiError(404, 'Prospect not found !! ');
+        }
+
+        // adding meeting
+        PROSPECT.Meeting.push(meetingDetail);
+
+        // save
+        await PROSPECT.save()
+            .then((Response) => {
+                if (Response) {
+                    res.status(200).json({
+                        message: `Meeting registered successfully with ${PROSPECT.FullName}.`,
+                    });
+                }
+            })
+            .catch((err) => {
+                throw new ApiError(415, 'Meeting registration failed !! ');
+            });
+    } catch (err) {
+        res.status(500).json({
+            statusCode: err.statusCode,
+            message: err.message,
+        });
+    }
+});
+
+// deleteMeeting
+
+export const deleteMeeting = asyncHandler(async (req, res) => {
+    try {
+        if (!req.user) {
+            throw new ApiError(401, 'User Session expired!! Try Re Login !');
+        }
+
+        const { prospect_id, meeting_id } = req.params;
+
+        // fetching prospect detail
+        // prospect detail
+        const PROSPECT = await Prospect.findById(
+            new ObjectId(String(prospect_id))
+        );
+        if (!PROSPECT) {
+            throw new ApiError(404, 'Prospect not found !!');
+        }
+
+        // deletion
+        PROSPECT.Meeting = PROSPECT.Meeting.filter(
+            (meeting, _) => meeting._id !== meeting_id
+        );
+
+        // saving
+        await PROSPECT.save()
+            .then((Response) => {
+                res.status(200).json({
+                    message: `Meeting with ${Response.FullName} is removed successfully !! `,
+                });
+            })
+            .catch((err) => {
+                throw new ApiError(500, 'Meeting deletion failed !! ');
+            });
     } catch (err) {
         res.status(500).json({
             statusCode: err.statusCode,

@@ -7,6 +7,8 @@ import {
     updateProspect,
     deleteProspect,
     searchProspects,
+    registerMeeting,
+    deleteMeeting,
 } from '../Controllers/prospect.controller.js';
 
 const prospectRouter = Router();
@@ -20,7 +22,7 @@ prospectRouter.route('/:prospect_id').delete(deleteProspect);
 prospectRouter.route('/search').get(searchProspects);
 
 // meeting
-// prospectRouter.route('/meeting/create').post(registerMeeting);
-// prospectRouter.route('/meeting/:meeting_id').delete(deleteMeeting);
+prospectRouter.route('/meeting/create').post(registerMeeting);
+prospectRouter.route('/meeting/:prospect_id/:meeting_id').delete(deleteMeeting);
 
 export default prospectRouter;
