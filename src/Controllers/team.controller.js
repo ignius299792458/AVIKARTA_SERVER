@@ -208,25 +208,34 @@ export const getTeamMemberDetail = asyncHandler(async (req, res) => {
             TeamLeader: new ObjectId(String(Member._id)),
         });
         if (!thatMemberOwnTeam) {
-            throw new ApiError(
-                404,
-                Member.fullName + ' has not started making team yet. '
-            );
+            res.status(200).json({
+                message: 'Member Detail fetched successfully !',
+                memberDetail: {
+                    fullName: Member.FullName,
+                    address: `${Member.District}, ${Member.Municipality}`,
+                    dob: Member.DateOfBirth,
+                    contact: Member.Phone,
+                    email: Member.Email,
+                    teamName: null,
+                    myLeader: req.user.FullName,
+                },
+                memberTeamMember: [],
+            });
+        } else {
+            res.status(200).json({
+                message: 'Member Detail fetched successfully !',
+                memberDetail: {
+                    fullName: Member.FullName,
+                    address: `${Member.District}, ${Member.Municipality}`,
+                    dob: Member.DateOfBirth,
+                    contact: Member.Phone,
+                    email: Member.Email,
+                    teamName: thatMemberOwnTeam.TeamName,
+                    myLeader: req.user.FullName,
+                },
+                memberTeamMember: thatMemberOwnTeam.TeamMembers,
+            });
         }
-
-        res.status(200).json({
-            message: 'Member Detail fetched successfully !',
-            memberDetail: {
-                fullName: Member.FullName,
-                address: `${Member.District}, ${Member.Municipality}`,
-                dob: Member.DateOfBirth,
-                contact: Member.Phone,
-                email: Member.Email,
-                teamName: thatMemberOwnTeam.TeamName,
-                myLeader: req.user.FullName,
-            },
-            memberTeamMember: thatMemberOwnTeam.TeamMembers,
-        });
     } catch (err) {
         res.status(500).json({
             statusCode: err.statusCode,
@@ -335,8 +344,6 @@ export const deleteMembershipRequest = asyncHandler(async (req, res) => {
 
         res.status(200).json({
             message: 'Request deleted successfully !!',
-            data: teamDetail,
-            mydetail: USER,
         });
     } catch (err) {
         res.status(500).json({
