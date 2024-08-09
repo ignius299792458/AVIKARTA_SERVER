@@ -301,6 +301,7 @@ export const deleteMembershipRequest = asyncHandler(async (req, res) => {
         if (!req.user) {
             throw new ApiError(401, 'User Session expired!! Try Re Login !');
         }
+        console.log('teamname delete:', req.body);
 
         const { TeamName } = req.body;
 

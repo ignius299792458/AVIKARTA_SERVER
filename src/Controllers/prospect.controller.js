@@ -50,7 +50,8 @@ export const getMyPropects = asyncHandler(async (req, res) => {
                     return {
                         FullName: prospect.FullName,
                         Phone: prospect.Phone,
-                        Address: `${prospect.District} ${prospect.Address}`,
+                        Address: `${prospect.District} ${prospect.Municipality}`,
+                        Email: prospect.Email,
                         CreatedAt: prospect.createdAt,
                         _id: prospect.id,
                     };
