@@ -49,6 +49,10 @@ export const getMyPropects = asyncHandler(async (req, res) => {
                 data: allMyPropects.map((prospect, _) => {
                     return {
                         FullName: prospect.FullName,
+                        Avatar: {
+                            PublicId: prospect.Avatar.PublicId,
+                            SecureURL: prospect.Avatar.SecureURL,
+                        },
                         Phone: prospect.Phone,
                         Address: `${prospect.District} ${prospect.Municipality}`,
                         Email: prospect.Email,
