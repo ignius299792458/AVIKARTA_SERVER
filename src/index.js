@@ -9,9 +9,9 @@ import mongodbApi from '../src/DB/connect.db.js';
 // const serverHost = '192.168.1.114' || 'localhost'; //metalogic4g
 // const serverHost = '192.168.18.8' || 'localhost'; //room
 
-// const serverHost = 'localhost';
-const serverHost = '192.168.1.165' || 'localhost'; //metalogic2g
-console.log('server_host: ', serverHost);
+const serverHost = 'localhost';
+// const serverHost = '192.168.1.165' || 'localhost'; //metalogic2g
+// console.log('server_host: ', serverHost);
 mongodbApi()
     .then(() => {
         app.listen(process.env.PORT, serverHost, () => {

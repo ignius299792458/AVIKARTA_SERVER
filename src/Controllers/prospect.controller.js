@@ -200,7 +200,10 @@ export const registerMeeting = asyncHandler(async (req, res) => {
                 }
             })
             .catch((err) => {
-                throw new ApiError(415, 'Meeting registration failed !! ');
+                throw new ApiError(
+                    415,
+                    'Meeting registration failed !! ' + err
+                );
             });
     } catch (err) {
         res.status(500).json({
@@ -219,8 +222,8 @@ export const deleteMeeting = asyncHandler(async (req, res) => {
         }
 
         const { prospect_id, meeting_id } = req.params;
+        // console.log('prp id, meet id : ', prospect_id, meeting_id, req.params);
 
-        // fetching prospect detail
         // prospect detail
         const PROSPECT = await Prospect.findById(
             new ObjectId(String(prospect_id))
@@ -229,9 +232,18 @@ export const deleteMeeting = asyncHandler(async (req, res) => {
             throw new ApiError(404, 'Prospect not found !!');
         }
 
+        // checking meeting
+        const checkingMeeting = PROSPECT.Meeting.find(
+            (item) => String(item._id) === String(meeting_id)
+        );
+
+        if (!checkingMeeting) {
+            throw new ApiError(404, 'Meeting not found!');
+        }
+
         // deletion
         PROSPECT.Meeting = PROSPECT.Meeting.filter(
-            (meeting, _) => meeting._id !== meeting_id
+            (meeting, _) => String(meeting._id) !== String(meeting_id)
         );
 
         // saving

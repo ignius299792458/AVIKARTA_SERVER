@@ -19,11 +19,6 @@ app.use(cookieParser()); // cookie-parser
 
 // middleware Utils
 
-//
-// String.prototype.toObjectId = function () {
-//     return new ObjectId(this.toString());
-// };
-
 // Routers
 import userRouter from './Routes/user.route.js';
 import prospectRouter from './Routes/prospect.route.js';
