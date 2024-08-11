@@ -19,7 +19,7 @@ jobs:
                   node-version: '21'
 
             - name: 🔨 Build Project
-              run: npm install && npm build
+              run: npm install
 
             - name: 📂 Copy Build Files to the server
               uses: appleboy/scp-action@v0.1.7
