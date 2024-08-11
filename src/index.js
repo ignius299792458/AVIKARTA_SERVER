@@ -5,11 +5,11 @@ import app from './app.js';
 import mongodbApi from '../src/DB/connect.db.js';
 
 // ------------------------------ setting MONGOOSE database and PORT listen ------------------------------
-// const serverHost = '192.168.16.151' || 'localhost'; //metalogic2g
+const serverHost = '192.168.16.151' || 'localhost'; //metalogic2g
 // const serverHost = '192.168.1.114' || 'localhost'; //metalogic4g
 // const serverHost = '192.168.18.8' || 'localhost'; //room
 
-const serverHost = 'localhost';
+// const serverHost = 'localhost';
 // const serverHost = '192.168.1.165' || 'localhost'; //metalogic2g
 // console.log('server_host: ', serverHost);
 mongodbApi()

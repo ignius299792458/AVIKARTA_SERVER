@@ -78,6 +78,7 @@ const clientSchema = new mongoose.Schema(
             PolicyNo: {
                 type: Number,
                 required: [true, 'Policy Number cannot be empty. '],
+                unique: [true, 'Policy Number should be unique'],
             },
             PolicyType: {
                 type: Number,

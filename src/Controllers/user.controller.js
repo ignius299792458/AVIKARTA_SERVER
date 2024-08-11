@@ -62,12 +62,12 @@ const loginUser = asyncHandler(async (req, res) => {
 
         // const isPasswordMatched = await loggedUser.checkPassword(Password);
         const isPasswordMatched = (await loggedUser.Password) === Password;
-        console.log('pas val: ', isPasswordMatched);
+        // console.log('pas val: ', isPasswordMatched);
         if (isPasswordMatched) {
-            console.log(loggedUser.Password);
+            // console.log(loggedUser.Password);
             sendTokenResponse(200, loggedUser, res, 'Login Successfull !! 😎');
         } else {
-            console.log(loggedUser.Password, '\n\nuser: ', loggedUser);
+            // console.log(loggedUser.Password, '\n\nuser: ', loggedUser);
             throw new ApiError(401, 'Password Invalid !! 😣');
         }
     } catch (err) {
@@ -119,7 +119,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 //  resetPassword
 const resetPassword = asyncHandler(async (req, res) => {
     try {
-        console.log('reset password: ', req.body);
+        // console.log('reset password: ', req.body);
         const { Phone, OTP, newPassword } = req.body;
 
         const resetUser = await User.findOne({
@@ -131,7 +131,7 @@ const resetPassword = asyncHandler(async (req, res) => {
         // }
 
         // save confirmed password
-        console.log('OTPs: ', resetUser.OTP, OTP);
+        // console.log('OTPs: ', resetUser.OTP, OTP);
         if (resetUser.OTP === OTP) {
             const isChanged = await resetUser.changePassword(newPassword);
             if (isChanged) {
@@ -204,7 +204,7 @@ const updatePassword = asyncHandler(async (req, res) => {
 //  getUserDetails
 const getUserDetails = asyncHandler(async (req, res) => {
     try {
-        console.log('user dtail: ', req.user);
+        // console.log('user dtail: ', req.user);
         const userDetail = await User.findById(
             new ObjectId(String(req.user._id))
         );

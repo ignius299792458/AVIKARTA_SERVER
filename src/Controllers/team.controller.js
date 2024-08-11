@@ -263,8 +263,6 @@ export const teamRequestAcceptHandler = asyncHandler(async (req, res) => {
             throw new ApiError(404, 'Team is not found !');
         }
 
-        // console.log('stage 1:  ', teamDetail);
-        // update membership status to "confirmed"
         let confirmed = false;
         teamDetail.TeamMembers.forEach((element) => {
             if (
@@ -289,7 +287,6 @@ export const teamRequestAcceptHandler = asyncHandler(async (req, res) => {
                     user: user,
                 },
             });
-
             await sendEmail({
                 // email: ,
                 subject: `AVIKARTA: ${user.FullName} sent you membership request. `,
@@ -310,7 +307,7 @@ export const deleteMembershipRequest = asyncHandler(async (req, res) => {
         if (!req.user) {
             throw new ApiError(401, 'User Session expired!! Try Re Login !');
         }
-        console.log('teamname delete:', req.body);
+        // console.log('teamname delete:', req.body);
 
         const { TeamName } = req.body;
 

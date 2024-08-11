@@ -1,6 +1,7 @@
 import asyncHandler from '../Utils/asyncHandler.util.js';
 import ApiError from '../Utils/apiError.util.js';
 import { ObjectId } from 'mongodb';
+import { Client } from '../Models/client.model.js';
 
 export const selfAssuredReport = asyncHandler(async (req, res) => {
     try {
@@ -8,8 +9,22 @@ export const selfAssuredReport = asyncHandler(async (req, res) => {
             throw new ApiError(401, 'User Session expired!! Try Re Login !');
         }
 
+        const allMyClients = await Client.find({
+            OwnedBy: new ObjectId(String(req.user._id)),
+        });
+
+        // self assured
+        let selfAssuredValue = 0;
+        allMyClients.forEach((client, _) => {
+            selfAssuredValue += client.ClientInsuranceInfo.SumAssured;
+        });
+
         res.status(200).json({
-            data: {},
+            data: allMyClients.map((client, _) => ({
+                clientName: client.FullName,
+                sumAssured: client.ClientInsuranceInfo.SumAssured,
+            })),
+            selfAssuredValue: selfAssuredValue,
             message: 'self Assured Report submitted successfully. !! 😟',
         });
     } catch (err) {

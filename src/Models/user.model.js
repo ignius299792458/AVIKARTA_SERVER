@@ -112,12 +112,12 @@ userSchema.pre('save', async function (next) {
 });
 
 userSchema.methods.changePassword = async function (newPassword) {
-    console.log('\n\nbefore user: ', this.Password, this.Phone, this.FullName);
+    // console.log('\n\nbefore user: ', this.Password, this.Phone, this.FullName);
     this.Password = await bcrypt.hash(newPassword, 10);
     this.resetPasswordExpire = undefined;
     await this.save();
     if (this.checkPassword(newPassword)) {
-        console.log('after changed: ', this.Password);
+        // console.log('after changed: ', this.Password);
         return true;
     } else {
         return false;
@@ -133,7 +133,7 @@ userSchema.methods.generateAccessToken = function () {
 
 // check password
 userSchema.methods.checkPassword = async function (Password) {
-    console.log('checkingPassword: ', Password);
+    // console.log('checkingPassword: ', Password);
     return (await bcrypt.compare(Password, this.Password)).valueOf(); // checking pswd
     // return (
     //     await bcrypt.compare(
@@ -158,12 +158,12 @@ function generateOTP() {
 // Generating psswd reset token
 userSchema.methods.getResetPswdToken = async function () {
     // hashing and adding resetpsswd token
-    console.log('\nbefore: ', this.OTP);
+    // console.log('\nbefore: ', this.OTP);
     const OTP = generateOTP();
     this.OTP = Number(OTP);
     this.resetPasswordExpire = Date.now() + 2 * 60 * 1000; // expires in 2 mins
     await this.save();
-    console.log('after: ', this.OTP);
+    // console.log('after: ', this.OTP);
     return OTP;
 };
 
