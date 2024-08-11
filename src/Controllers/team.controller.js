@@ -124,6 +124,7 @@ export const addTeamMember = asyncHandler(async (req, res) => {
             Phone: addingMember.Phone,
             Address: addingMember.Municipality + ', ' + addingMember.District,
             Email: addingMember.Email,
+            SelfAssured: addingMember.SelfAssured,
         });
 
         // Save the updated team and addingMember data

@@ -1,13 +1,19 @@
 import { Router } from 'express';
 
 import {
+    primaryMembersReport,
+    secondaryMembersReport,
     selfAssuredReport,
-    totalTeamBudgetReport,
 } from '../Controllers/report.controller.js';
 
 const reportRouter = Router();
 
 reportRouter.route('/self-assured-report').get(selfAssuredReport);
-reportRouter.route('/total-team-budget').get(totalTeamBudgetReport);
+
+// team reporting
+reportRouter.route('/primary-member-report').get(primaryMembersReport);
+reportRouter
+    .route('/secondary-member-report/:phone')
+    .get(secondaryMembersReport);
 
 export default reportRouter;

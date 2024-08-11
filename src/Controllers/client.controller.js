@@ -3,6 +3,7 @@ import ApiError from '../Utils/apiError.util.js';
 import { Client } from '../Models/client.model.js';
 import { ObjectId } from 'mongodb';
 import User from '../Models/user.model.js';
+import mongoose from 'mongoose';
 
 // register Clients
 export const registerClient = asyncHandler(async (req, res) => {
@@ -187,6 +188,49 @@ export const registerManyClient = asyncHandler(async (req, res) => {
         res.status(500).json({
             statusCode: err.statusCode,
             message: err.message,
+        });
+    }
+});
+
+// queryClients
+export const queryClients = asyncHandler(async (req, res) => {
+    try {
+        const { fullName, phone, province, district, municipality } = req.query;
+
+        let query = { OwnedBy: new ObjectId(String(req.user._id)) };
+
+        if (fullName) {
+            query.FullName = { $regex: fullName, $options: 'i' };
+        }
+
+        if (phone) {
+            query.Phone = phone;
+        }
+
+        if (province) {
+            query.Province = province;
+        }
+
+        if (district) {
+            query.District = district;
+        }
+
+        if (municipality) {
+            query.Municipality = municipality;
+        }
+
+        // console.log('Constructed query:', query);
+
+        const clientsData = await Client.find(query);
+
+        res.status(200).json({
+            message: 'Client filtered data submitted successfully !',
+            data: clientsData,
+        });
+    } catch (error) {
+        res.status(500).json({
+            statusCode: error.statusCode,
+            message: error.message,
         });
     }
 });

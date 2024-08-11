@@ -37,7 +37,7 @@ app.use('/v1/report', authenticateUser, reportRouter);
 // API testing
 app.get('/', function (req, res, next) {
     res.json({
-        msg: `This is avikarta api protal line.... `,
+        msg: `This is api protal line.... `,
     });
 });
 

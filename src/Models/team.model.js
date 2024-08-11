@@ -15,6 +15,7 @@ const teamSchema = new mongoose.Schema(
                 Phone: String,
                 Address: String,
                 Email: String,
+                SelfAssured: Number,
                 MembershipStatus: {
                     type: String,
                     default: 'pending',
