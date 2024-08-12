@@ -53,12 +53,30 @@ export const primaryMembersReport = asyncHandler(async (req, res) => {
             throw new ApiError(401, 'User Session expired!! Try Re Login !');
         }
 
+        let totalTeamBudget = 0;
         const primaryList = await User.find({
             MyLeader: new ObjectId(String(req.user._id)),
         });
 
+        primaryList.forEach(async (member, _) => {
+            console.log(`${member.FullName}:  ${member.SelfAssured}`);
+            totalTeamBudget += member.SelfAssured;
+
+            // fetch secondary member:
+            await User.find({
+                MyLeader: new ObjectId(String(member._id)),
+            }).then((Respone) => {
+                Respone.forEach((mmember, _) => {
+                    console.log(
+                        `${member.FullName} 's member: ${mmember.FullName} : ${mmember.SelfAssured}`
+                    );
+                    totalTeamBudget += mmember.SelfAssured;
+                });
+            });
+        });
+
         res.status(200).json({
-            data: primaryList.map((member, _) => {
+            primaryMembers: primaryList.map((member, _) => {
                 return {
                     id: member._id,
                     phone: member.Phone,
@@ -66,6 +84,8 @@ export const primaryMembersReport = asyncHandler(async (req, res) => {
                     selfAssured: member.SelfAssured,
                 };
             }),
+
+            totalBudget: totalTeamBudget,
         });
     } catch (err) {
         res.status(500).json({
@@ -75,7 +95,7 @@ export const primaryMembersReport = asyncHandler(async (req, res) => {
     }
 });
 
-export const secondaryMembersReport = asyncHandler(async (req, res) => {
+export const secondaryMembersDetail = asyncHandler(async (req, res) => {
     try {
         if (!req.user) {
             throw new ApiError(401, 'User Session expired!! Try Re Login !');
@@ -86,45 +106,60 @@ export const secondaryMembersReport = asyncHandler(async (req, res) => {
         // Member Detail
         const Member = await User.findOne({ Phone: phone });
 
-        if (String(Member.MyLeader) !== String(req.user._id)) {
-            throw new ApiError(401, "You aren't this member's leader. ");
-        }
-
         if (!Member) {
             throw new ApiError(404, 'Member detail fetching failed !! ');
+        }
+
+        if (String(Member.MyLeader) !== String(req.user._id)) {
+            throw new ApiError(401, "You aren't this member's leader. ");
         }
 
         // fetch MEMBER's own team detail
         const thatMemberOwnTeam = await Team.findOne({
             TeamLeader: new ObjectId(String(Member._id)),
         });
+
+        // secondary member list handler
+        async function handleSecondaryMember(memberList) {
+            return Promise.all(
+                memberList.map(async (member) => {
+                    const response = await User.findOne({
+                        Phone: member.Phone,
+                    });
+                    return {
+                        name: response.FullName,
+                        phone: response.Phone,
+                        selfAssured: response.SelfAssured,
+                    };
+                })
+            );
+        }
+
         if (!thatMemberOwnTeam) {
             res.status(200).json({
                 message: 'Member Detail fetched successfully !',
                 memberDetail: {
                     fullName: Member.FullName,
-                    address: `${Member.District}, ${Member.Municipality}`,
-                    dob: Member.DateOfBirth,
-                    contact: Member.Phone,
-                    email: Member.Email,
+                    phone: Member.Phone,
                     teamName: null,
                     myLeader: req.user.FullName,
                 },
                 memberTeamMember: [],
             });
         } else {
+            const teamMembers = await handleSecondaryMember(
+                thatMemberOwnTeam.TeamMembers
+            );
+
             res.status(200).json({
                 message: 'Member Detail fetched successfully !',
                 memberDetail: {
                     fullName: Member.FullName,
-                    address: `${Member.District}, ${Member.Municipality}`,
-                    dob: Member.DateOfBirth,
-                    contact: Member.Phone,
-                    email: Member.Email,
+                    phone: Member.Phone,
                     teamName: thatMemberOwnTeam.TeamName,
                     myLeader: req.user.FullName,
                 },
-                memberTeamMember: thatMemberOwnTeam.TeamMembers,
+                memberTeamMember: teamMembers,
             });
         }
     } catch (err) {

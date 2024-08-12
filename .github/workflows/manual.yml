@@ -21,14 +21,14 @@ jobs:
       - name: 🔨 Install Dependencies
         run: npm install
 
-      - name: 📂 Copy Files to the server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          source: 'src'
-          target: '~/AVIKARTA_BACKEND/src/'
+            - name: 📂 Copy Build Files to the server
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  password: ${{ secrets.PASSWORD }}
+                  source: 'src'
+                  target: ~/AVIKARTA_BACKEND/
 
       - name: ♻️ Restart the server
         uses: appleboy/ssh-action@v0.1.7

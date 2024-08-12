@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import {
     primaryMembersReport,
-    secondaryMembersReport,
+    secondaryMembersDetail,
     selfAssuredReport,
 } from '../Controllers/report.controller.js';
 
@@ -14,6 +14,6 @@ reportRouter.route('/self-assured-report').get(selfAssuredReport);
 reportRouter.route('/primary-member-report').get(primaryMembersReport);
 reportRouter
     .route('/secondary-member-report/:phone')
-    .get(secondaryMembersReport);
+    .get(secondaryMembersDetail);
 
 export default reportRouter;

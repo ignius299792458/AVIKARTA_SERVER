@@ -26,10 +26,6 @@ const teamSchema = new mongoose.Schema(
             ref: 'User',
             required: [true, "TeamLeader can't be empty !"],
         },
-        TeamBudget: {
-            type: Number,
-            default: 0,
-        },
     },
     {
         toJSON: {
