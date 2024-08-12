@@ -27,7 +27,7 @@ jobs:
                   host: ${{ secrets.HOST }}
                   username: ${{ secrets.USERNAME }}
                   password: ${{ secrets.PASSWORD }}
-                  source: 'src'
+                  source: 'AVIKARTA_BACKEND'
                   target: ~/AVIKARTA_BACKEND/
 
             - name: ♻️ Restart the server
