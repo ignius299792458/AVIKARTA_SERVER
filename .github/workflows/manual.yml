@@ -40,3 +40,4 @@ jobs:
                       cd ~/AVIKARTA_BACKEND &&
                       git pull &&
                       npm start
+                      touch ~/AVIKARTA_BACKEND/tmp/restart.txt
