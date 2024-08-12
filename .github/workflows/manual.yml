@@ -39,5 +39,5 @@ jobs:
                   script: |
                       cd ~/AVIKARTA_BACKEND &&
                       git pull &&
-                      npm start
+                      npm start &&
                       touch ~/AVIKARTA_BACKEND/tmp/restart.txt
