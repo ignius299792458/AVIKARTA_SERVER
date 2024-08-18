@@ -102,27 +102,12 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.pre('save', async function (next) {
-    // carefully don't use () => for this middleware
-    //  fallsafe for password edited due to user update
     if (!this.isModified('Password')) {
         return next();
     }
-    this.Password = await bcrypt.hash(this.Password, 10); // encryption
+    this.Password = await bcrypt.hash(this.Password, 10);
     next();
 });
-
-userSchema.methods.changePassword = async function (newPassword) {
-    // console.log('\n\nbefore user: ', this.Password, this.Phone, this.FullName);
-    this.Password = await bcrypt.hash(newPassword, 10);
-    this.resetPasswordExpire = undefined;
-    await this.save();
-    if (this.checkPassword(newPassword)) {
-        // console.log('after changed: ', this.Password);
-        return true;
-    } else {
-        return false;
-    }
-};
 
 //  Access Token
 userSchema.methods.generateAccessToken = function () {
@@ -133,19 +118,15 @@ userSchema.methods.generateAccessToken = function () {
 
 // check password
 userSchema.methods.checkPassword = async function (Password) {
-    // console.log('checkingPassword: ', Password);
-    return (await bcrypt.compare(Password, this.Password)).valueOf(); // checking pswd
-    // return (
-    //     await bcrypt.compare(
-    //         Password,
-    //         '$2b$10$LrAtJM37zKmSyXFg8NHlSOvAdDjB1cTgvYFmEuZXWgxlQbJPtpDU.'
-    //     )
-    // ).valueOf(); // checking pswd
+    const isPassword = (
+        await bcrypt.compare(Password, this.Password)
+    ).valueOf();
+    return isPassword;
 };
 
 // six Code OTP generator
 function generateOTP() {
-    let code = Math.floor(100000 + Math.random() * 900000); // Generate a random number between 100000 and 999999
+    let code = Math.floor(100000 + Math.random() * 900000);
 
     // Check if the code is exactly six digits
     while (code.toString().length !== 6) {
@@ -161,10 +142,29 @@ userSchema.methods.getResetPswdToken = async function () {
     // console.log('\nbefore: ', this.OTP);
     const OTP = generateOTP();
     this.OTP = Number(OTP);
-    this.resetPasswordExpire = Date.now() + 2 * 60 * 1000; // expires in 2 mins
+    this.resetPasswordExpire = new Date(Date.now() + 2 * 60 * 1000);
     await this.save();
-    // console.log('after: ', this.OTP);
     return OTP;
+};
+
+// changed Password
+userSchema.methods.changePassword = async function (newPassword) {
+    console.log(
+        '\n\nbefore: ',
+        newPassword,
+        this.Password,
+        this.Phone,
+        this.FullName
+    );
+    this.Password = newPassword;
+    this.resetPasswordExpire = undefined;
+    await this.save();
+    if (this.checkPassword(newPassword)) {
+        console.log('\nafter: ', this.Password);
+        return true;
+    } else {
+        return false;
+    }
 };
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);

@@ -7,9 +7,9 @@ import mongodbApi from './src/DB/connect.db.js';
 // deploy
 mongodbApi()
     .then(() => {
-        app.listen(process.env.PORT, () => {
-            console.log(`-->R: server is running now... `);
-        });
+        app.listen(process.env.PORT, () =>
+            console.log('Server on port: ' + process.env.PORT)
+        );
     })
     .catch((error) => {
         console.log('-->E: DB connection FAILED !! ', error, '@src/index.js');

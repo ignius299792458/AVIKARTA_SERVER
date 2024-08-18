@@ -8,7 +8,7 @@ import {
     getUserDetails,
     updatePassword,
     updateProfile,
-    deleteUser,
+    changePassword,
     insertManyUser,
 } from '../Controllers/user.controller.js';
 
@@ -27,7 +27,7 @@ userRouter.route('/logout').get(authenticateUser, logOut);
 userRouter.route('/password/update').patch(authenticateUser, updatePassword);
 userRouter.route('/me').get(authenticateUser, getUserDetails);
 userRouter.route('/me/update').patch(authenticateUser, updateProfile);
-userRouter.route('/me/delete').delete(authenticateUser, deleteUser);
+userRouter.route('/me/change-pswd').patch(authenticateUser, changePassword);
 
 userRouter.route('/insert_many').post(insertManyUser);
 

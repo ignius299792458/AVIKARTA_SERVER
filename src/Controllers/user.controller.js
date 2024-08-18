@@ -29,9 +29,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
         const newUser = await User.create({ ...req.body });
 
-        const createdUser = await User.findById(newUser._id).select(
-            '-password'
-        );
+        const createdUser = await User.findById(newUser._id);
 
         if (!createdUser) {
             throw new ApiError(500, 'Registration Fail !!');
@@ -60,8 +58,8 @@ const loginUser = asyncHandler(async (req, res) => {
             throw new ApiError(404, 'User is not registered !! -> ');
         }
 
-        // const isPasswordMatched = await loggedUser.checkPassword(Password);
-        const isPasswordMatched = (await loggedUser.Password) === Password;
+        const isPasswordMatched = await loggedUser.checkPassword(Password);
+        // const isPasswordMatched = (await loggedUser.Password) === Password;
         // console.log('pas val: ', isPasswordMatched);
         if (isPasswordMatched) {
             // console.log(loggedUser.Password);
@@ -81,14 +79,12 @@ const loginUser = asyncHandler(async (req, res) => {
 //  forgetPassword
 const forgotPassword = asyncHandler(async (req, res) => {
     try {
-        const { Email, Phone } = req.body;
+        const { Phone } = req.body;
 
-        const validUser = await User.findOne({
-            $or: [{ Email }, { Phone }],
-        });
+        const validUser = await User.findOne({ Phone: Phone });
 
         if (!validUser) {
-            throw new ApiError(404, 'Email or Phone Number is found !!');
+            throw new ApiError(404, 'Email or Phone Number is not found !!');
         }
 
         // Reset password Token
@@ -103,10 +99,10 @@ const forgotPassword = asyncHandler(async (req, res) => {
             subject: 'AVIKARTA: Reset OTP',
             mailContent: message,
         });
-
+        console.log(OTP);
         res.status(200).json({
             success: true,
-            message: `Email is sent to ${validUser.Email} successfully`,
+            message: 'OTP is sent to your email successfully',
         });
     } catch (err) {
         res.status(500).json({
@@ -126,18 +122,23 @@ const resetPassword = asyncHandler(async (req, res) => {
             Phone: Phone,
         });
 
-        // if (String(Date.now()) >= String(resetUser.resetPasswordExpire)) {
-        //     throw new ApiError(400, 'OTP is Expired !');
-        // }
+        console.log(
+            'otp exiry dates: ',
+            new Date(Date.now()),
+            new Date(resetUser.resetPasswordExpire)
+        );
+
+        if (new Date(Date.now()) >= resetUser.resetPasswordExpire) {
+            throw new ApiError(419, 'OTP is Expired !');
+        }
 
         // save confirmed password
-        // console.log('OTPs: ', resetUser.OTP, OTP);
+        console.log('OTPs: ', resetUser.OTP, OTP);
         if (resetUser.OTP === OTP) {
             const isChanged = await resetUser.changePassword(newPassword);
             if (isChanged) {
                 res.status(200).json({
                     status: 200,
-                    Password: resetUser.Password,
                     message: 'Reset Password Successfull !! 😎',
                 });
             } else {
@@ -148,7 +149,7 @@ const resetPassword = asyncHandler(async (req, res) => {
         }
     } catch (err) {
         res.status(500).json({
-            statusCode: 400,
+            statusCode: err.statusCode,
             message: err.message,
         });
     }
@@ -158,9 +159,6 @@ const resetPassword = asyncHandler(async (req, res) => {
 
 // logout
 const logOut = asyncHandler(async (req, res) => {
-    // Clear token from client-side storage (e.g., cookies or local storage)
-    // res.clearCookie('jwtToken'); // Example for clearing cookie
-
     if (req.user) {
         res.status(200).json({
             success: true,
@@ -247,14 +245,70 @@ const insertManyUser = asyncHandler(async (req, res) => {
     }
 });
 
-// update Profile
-const updateProfile = asyncHandler(async (req, res) => {
-    res.status(200).json({ message: 'update profile' });
+// change Password
+const changePassword = asyncHandler(async (req, res) => {
+    try {
+        if (!req.user) {
+            throw new ApiError(401, 'User Session Expired !');
+        }
+        const { currentPassword, newPassword } = req.body;
+
+        const dbUSER = await User.findById(req.user._id);
+
+        // check current password
+        const isPasswordVerified = await dbUSER.checkPassword(currentPassword);
+        if (isPasswordVerified) {
+            // changingPassword
+            const isChanged = await dbUSER.changePassword(newPassword);
+            if (isChanged) {
+                res.status(200).json({
+                    message: 'Password changed successfully !!',
+                });
+            }
+        } else {
+            new ApiError(403, 'Current Password is incorrect !!');
+        }
+
+        // change current pswd
+    } catch (err) {
+        res.status(500).json({
+            statusCode: err.statusCode,
+            message: err.message,
+        });
+    }
 });
 
-const deleteUser = asyncHandler(async (req, res) => {
-    res.status(200).json({ message: 'Delete user portal' });
-});
+// update Profile
+const updateProfile = async (req, res) => {
+    try {
+        if (!req.user) {
+            throw new ApiError(401, 'User Session Expired !');
+        }
+
+        const updates = req.body;
+
+        // Find the user by ID and update with the provided data
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user._id,
+            { $set: updates },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedUser) {
+            throw new ApiError(401, 'Unable to update profile !');
+        }
+
+        res.status(200).json({
+            message: 'Profile updated successfully !',
+            data: updatedUser,
+        });
+    } catch (err) {
+        res.status(500).json({
+            statusCode: err.statusCode,
+            message: err.message,
+        });
+    }
+};
 
 export {
     registerUser,
@@ -265,6 +319,6 @@ export {
     getUserDetails,
     updatePassword,
     updateProfile,
-    deleteUser,
+    changePassword,
     insertManyUser,
 };
